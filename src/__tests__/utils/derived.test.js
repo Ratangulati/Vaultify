@@ -45,18 +45,15 @@ describe('computeTotalBalance', () => {
 })
 
 describe('computeBalanceTrendData', () => {
-  it('returns one entry per month', () => {
+  it('returns a 6 month series ending at latest month', () => {
     const result = computeBalanceTrendData(txns)
-    expect(result).toHaveLength(2)
-    expect(result[0].month).toBe('2026-01')
-    expect(result[1].month).toBe('2026-02')
+    expect(result).toHaveLength(6)
+    expect(result[result.length - 1].month).toBe('Feb')
   })
   it('accumulates balance across months', () => {
     const result = computeBalanceTrendData(txns)
-    // Jan: 5000 - 1200 - 100 = 3700
-    expect(result[0].balance).toBe(3700)
-    // Feb: 3700 + 5000 - 1200 - 150 = 7350
-    expect(result[1].balance).toBe(7350)
+    expect(result[result.length - 2].balance).toBe(3700)
+    expect(result[result.length - 1].balance).toBe(7350)
   })
 })
 

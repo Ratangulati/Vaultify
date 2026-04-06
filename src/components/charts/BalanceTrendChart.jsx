@@ -5,16 +5,22 @@ import { useApp } from '../../context/AppContext'
 
 export default function BalanceTrendChart() {
   const { balanceTrendData } = useApp()
+  const hasData = balanceTrendData.some(point => point.balance !== 0)
 
   return (
-    <div className="bg-[#13111e] border border-[#1e1c33] rounded-xl p-4 flex flex-col h-full">
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 dark:border-[#1e1c33] dark:bg-[#13111e]">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <p className="text-slate-100 text-sm font-bold">Balance Trend</p>
-          <p className="text-slate-600 text-xs">Jan – Mar 2026</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Balance Trend</p>
+          <p className="text-xs text-slate-500 dark:text-slate-600">Last 6 months</p>
         </div>
-        <span className="bg-indigo-950 text-indigo-400 text-xs px-2 py-1 rounded-md">3 months</span>
+        <span className="rounded-md bg-indigo-50 px-2 py-1 text-xs text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400">6 months</span>
       </div>
+      {!hasData ? (
+        <div className="flex h-[200px] items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-500 dark:border-[#2d2b52]">
+          No balance trend data available yet.
+        </div>
+      ) : (
       <ResponsiveContainer width="100%" height={200}>
         <AreaChart data={balanceTrendData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
           <defs>
@@ -56,6 +62,7 @@ export default function BalanceTrendChart() {
           />
         </AreaChart>
       </ResponsiveContainer>
+      )}
     </div>
   )
 }

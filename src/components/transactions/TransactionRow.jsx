@@ -1,4 +1,5 @@
 import { useApp } from '../../context/AppContext'
+import { HiOutlinePencilSquare, HiOutlineTrash } from 'react-icons/hi2'
 
 const CATEGORY_COLORS = {
   Rent:          { bg: 'bg-red-950',     text: 'text-red-400'     },
@@ -15,9 +16,9 @@ export default function TransactionRow({ transaction, onEdit, onDelete }) {
   const isIncome = transaction.type === 'income'
 
   return (
-    <tr className="border-b border-[#16141f] hover:bg-[#16141f] transition-colors">
-      <td className="px-4 py-2.5 text-slate-500 text-xs">{transaction.date}</td>
-      <td className="px-4 py-2.5 text-slate-200 text-xs font-medium">{transaction.description}</td>
+    <tr className="border-b border-slate-200 transition-colors hover:bg-slate-50 dark:border-[#16141f] dark:hover:bg-[#16141f]">
+      <td className="px-4 py-2.5 text-xs text-slate-500">{transaction.date}</td>
+      <td className="px-4 py-2.5 text-xs font-medium text-slate-900 dark:text-slate-200">{transaction.description}</td>
       <td className="px-4 py-2.5 text-xs">
         <span className={`${colors.bg} ${colors.text} px-2 py-0.5 rounded-full text-xs font-semibold`}>
           {transaction.category}
@@ -36,16 +37,22 @@ export default function TransactionRow({ transaction, onEdit, onDelete }) {
           <button
             onClick={() => onEdit(transaction)}
             aria-label="Edit transaction"
-            className="text-indigo-400 hover:text-indigo-300 mr-3 transition-colors"
+            className="mr-3 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-300 dark:hover:bg-[#16141f]"
           >
-            ✏️
+            <span className="inline-flex items-center gap-1.5">
+              <HiOutlinePencilSquare className="text-sm" aria-hidden="true" />
+              Edit
+            </span>
           </button>
           <button
             onClick={() => onDelete(transaction.id)}
             aria-label="Delete transaction"
-            className="text-red-400 hover:text-red-300 transition-colors"
+            className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-red-600 hover:bg-slate-50 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-red-400 dark:hover:bg-[#16141f]"
           >
-            🗑
+            <span className="inline-flex items-center gap-1.5">
+              <HiOutlineTrash className="text-sm" aria-hidden="true" />
+              Delete
+            </span>
           </button>
         </td>
       )}

@@ -9,6 +9,12 @@ import {
   computeTopCategory,
   computeBiggestTransaction,
   computeMomChange,
+  computeCurrentMonthIncome,
+  computeCurrentMonthExpenses,
+  computeTopCategoryThisMonth,
+  computeExpenseMomComparison,
+  computeAverageDailySpend,
+  computeOverspendAlert,
   applyFilters,
 } from '../utils/derived'
 
@@ -23,23 +29,52 @@ const DEFAULT_FILTERS = {
 }
 
 export function AppProvider({ children }) {
-  const [transactions, setTransactions] = useState(mockTransactions)
+  const [transactions, setTransactions] = useState(() => {
+    const raw = localStorage.getItem('finance.transactions')
+    if (!raw) return mockTransactions
+    try {
+      const parsed = JSON.parse(raw)
+      return Array.isArray(parsed) ? parsed : mockTransactions
+    } catch {
+      return mockTransactions
+    }
+  })
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
-  const [role, setRole] = useState('viewer')
+  const [role, setRole] = useState(() => localStorage.getItem('finance.role') || 'viewer')
   const [darkMode, setDarkMode] = useState(true)
+  const [chartsLoading, setChartsLoading] = useState(true)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
+  useEffect(() => {
+    localStorage.setItem('finance.transactions', JSON.stringify(transactions))
+  }, [transactions])
+
+  useEffect(() => {
+    localStorage.setItem('finance.role', role)
+  }, [role])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setChartsLoading(false), 700)
+    return () => clearTimeout(timer)
+  }, [])
+
   const totalIncome        = useMemo(() => computeTotalIncome(transactions), [transactions])
   const totalExpenses      = useMemo(() => computeTotalExpenses(transactions), [transactions])
   const totalBalance       = useMemo(() => computeTotalBalance(transactions), [transactions])
+  const monthlyIncome      = useMemo(() => computeCurrentMonthIncome(transactions), [transactions])
+  const monthlyExpenses    = useMemo(() => computeCurrentMonthExpenses(transactions), [transactions])
   const balanceTrendData   = useMemo(() => computeBalanceTrendData(transactions), [transactions])
   const spendingByCategory = useMemo(() => computeSpendingByCategory(transactions), [transactions])
   const topCategory        = useMemo(() => computeTopCategory(transactions), [transactions])
   const biggestTransaction = useMemo(() => computeBiggestTransaction(transactions), [transactions])
   const momChange          = useMemo(() => computeMomChange(transactions), [transactions])
+  const topCategoryThisMonth = useMemo(() => computeTopCategoryThisMonth(transactions), [transactions])
+  const expenseMomComparison = useMemo(() => computeExpenseMomComparison(transactions), [transactions])
+  const averageDailySpend = useMemo(() => computeAverageDailySpend(transactions), [transactions])
+  const overspendAlert    = useMemo(() => computeOverspendAlert(transactions), [transactions])
   const filteredTransactions = useMemo(() => applyFilters(transactions, filters), [transactions, filters])
 
   function addTransaction(txn) {
@@ -71,11 +106,18 @@ export function AppProvider({ children }) {
       totalIncome,
       totalExpenses,
       totalBalance,
+      monthlyIncome,
+      monthlyExpenses,
       balanceTrendData,
       spendingByCategory,
       topCategory,
+      topCategoryThisMonth,
       biggestTransaction,
       momChange,
+      expenseMomComparison,
+      averageDailySpend,
+      overspendAlert,
+      chartsLoading,
       filteredTransactions,
       setRole,
       addTransaction,

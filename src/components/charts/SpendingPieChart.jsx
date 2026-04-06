@@ -13,15 +13,21 @@ const CATEGORY_COLORS = {
 export default function SpendingPieChart() {
   const { spendingByCategory } = useApp()
   const total = spendingByCategory.reduce((s, c) => s + c.value, 0)
+  const hasData = total > 0
   const top = spendingByCategory.length > 0
     ? spendingByCategory.reduce((max, c) => (c.value > max.value ? c : max), spendingByCategory[0])
     : null
   const topPct = top && total > 0 ? ((top.value / total) * 100).toFixed(0) : '0'
 
   return (
-    <div className="bg-[#13111e] border border-[#1e1c33] rounded-xl p-4 flex flex-col">
-      <p className="text-slate-100 text-sm font-bold">By Category</p>
-      <p className="text-slate-600 text-xs mb-2">Spending breakdown</p>
+    <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-4 dark:border-[#1e1c33] dark:bg-[#13111e]">
+      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">By Category</p>
+      <p className="mb-2 text-xs text-slate-500 dark:text-slate-600">Spending breakdown</p>
+      {!hasData ? (
+        <div className="flex h-[160px] items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-500 dark:border-[#2d2b52]">
+          No spending data to display.
+        </div>
+      ) : (
       <ResponsiveContainer width="100%" height={160}>
         <PieChart>
           <Pie
@@ -58,11 +64,18 @@ export default function SpendingPieChart() {
           )}
         </PieChart>
       </ResponsiveContainer>
+      )}
       <div className="flex flex-col gap-1 mt-1">
         {spendingByCategory.map(({ name, value }) => (
           <div key={name} className="flex justify-between text-xs">
-            <span style={{ color: CATEGORY_COLORS[name] || '#6b7280' }}>● {name}</span>
-            <span className="text-slate-500">{total > 0 ? ((value / total) * 100).toFixed(0) : 0}%</span>
+            <span className="inline-flex items-center gap-2 text-slate-700 dark:text-slate-300">
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{ backgroundColor: CATEGORY_COLORS[name] || '#6b7280' }}
+              />
+              {name}
+            </span>
+            <span className="text-slate-500 dark:text-slate-500">{total > 0 ? ((value / total) * 100).toFixed(0) : 0}%</span>
           </div>
         ))}
       </div>

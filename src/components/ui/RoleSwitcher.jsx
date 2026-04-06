@@ -5,26 +5,17 @@ export default function RoleSwitcher() {
 
   return (
     <div className="flex items-center gap-2">
-      <button
-        onClick={() => setRole('viewer')}
-        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-          role === 'viewer'
-            ? 'bg-indigo-900 border border-indigo-600 text-indigo-300'
-            : 'bg-[#111827] border border-slate-700 text-slate-500 hover:text-slate-300'
-        }`}
+      <label htmlFor="role-switcher" className="text-xs font-medium text-slate-400">Role</label>
+      <select
+        id="role-switcher"
+        aria-label="Select role"
+        value={role}
+        onChange={e => setRole(e.target.value)}
+        className="rounded-md border border-[#2d2b52] bg-[#111827] px-2 py-1 text-xs text-slate-200 outline-none focus:border-indigo-500"
       >
-        👁 Viewer
-      </button>
-      <button
-        onClick={() => setRole('admin')}
-        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-          role === 'admin'
-            ? 'bg-indigo-900 border border-indigo-600 text-indigo-300'
-            : 'bg-[#111827] border border-slate-700 text-slate-500 hover:text-slate-300'
-        }`}
-      >
-        🛡 Admin
-      </button>
+        <option value="viewer">Viewer</option>
+        <option value="admin">Admin</option>
+      </select>
     </div>
   )
 }

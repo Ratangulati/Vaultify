@@ -8,19 +8,20 @@ function Wrapper({ children }) {
 }
 
 describe('RoleSwitcher', () => {
-  it('renders Viewer and Admin buttons', () => {
+  it('renders role dropdown with options', () => {
     render(<RoleSwitcher />, { wrapper: Wrapper })
-    expect(screen.getByText(/Viewer/i)).toBeInTheDocument()
-    expect(screen.getByText(/Admin/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/select role/i)).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /viewer/i })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /admin/i })).toBeInTheDocument()
   })
 
-  it('clicking Admin does not throw', () => {
+  it('changing to Admin does not throw', () => {
     render(<RoleSwitcher />, { wrapper: Wrapper })
-    expect(() => fireEvent.click(screen.getByText(/Admin/i))).not.toThrow()
+    expect(() => fireEvent.change(screen.getByLabelText(/select role/i), { target: { value: 'admin' } })).not.toThrow()
   })
 
-  it('clicking Viewer does not throw', () => {
+  it('changing to Viewer does not throw', () => {
     render(<RoleSwitcher />, { wrapper: Wrapper })
-    expect(() => fireEvent.click(screen.getByText(/Viewer/i))).not.toThrow()
+    expect(() => fireEvent.change(screen.getByLabelText(/select role/i), { target: { value: 'viewer' } })).not.toThrow()
   })
 })

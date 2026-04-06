@@ -6,7 +6,6 @@ describe('InsightCard', () => {
   it('renders label, value, and subtext', () => {
     render(
       <InsightCard
-        icon="🏆"
         label="Top Category"
         value="Rent"
         subtext="$3,600 total"
@@ -18,10 +17,8 @@ describe('InsightCard', () => {
     expect(screen.getByText('$3,600 total')).toBeInTheDocument()
   })
 
-  it('renders icon', () => {
-    render(
-      <InsightCard icon="🏆" label="Top" value="Rent" subtext="$100" iconGradient="from-indigo-700 to-purple-700" />
-    )
-    expect(screen.getByText('🏆')).toBeInTheDocument()
+  it('does not require an icon prop', () => {
+    render(<InsightCard label="Top" value="Rent" subtext="$100" iconGradient="from-indigo-700 to-purple-700" />)
+    expect(screen.getByText('Top')).toBeInTheDocument()
   })
 })

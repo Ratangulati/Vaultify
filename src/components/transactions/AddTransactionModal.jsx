@@ -34,53 +34,53 @@ export default function AddTransactionModal({ transaction, onSave, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-[#13111e] border border-[#2d2b52] rounded-xl p-6 w-full max-w-md mx-4">
-        {transaction && (
-          <h2 className="text-slate-100 text-base font-bold mb-5">Edit Transaction</h2>
-        )}
+      <div className="w-full max-w-md mx-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-[#2d2b52] dark:bg-[#13111e]">
+        <h2 className="mb-5 text-base font-bold text-slate-900 dark:text-slate-100">
+          {transaction ? 'Edit Transaction' : 'New Transaction'}
+        </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label htmlFor="modal-date" className="text-slate-400 text-xs block mb-1">Date</label>
+            <label htmlFor="modal-date" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Date</label>
             <input
               id="modal-date"
               type="date"
               value={form.date}
               onChange={e => set('date', e.target.value)}
-              className="w-full bg-[#0d0d1a] border border-[#2d2b52] rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-200"
             />
             {errors.date && <p className="text-red-400 text-xs mt-1">{errors.date}</p>}
           </div>
           <div>
-            <label htmlFor="modal-desc" className="text-slate-400 text-xs block mb-1">Description</label>
+            <label htmlFor="modal-desc" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Description</label>
             <input
               id="modal-desc"
               type="text"
               value={form.description}
               onChange={e => set('description', e.target.value)}
               placeholder="e.g. Grocery Store"
-              className="w-full bg-[#0d0d1a] border border-[#2d2b52] rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-200"
             />
             {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description}</p>}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="modal-category" className="text-slate-400 text-xs block mb-1">Category</label>
+              <label htmlFor="modal-category" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Category</label>
               <select
                 id="modal-category"
                 value={form.category}
                 onChange={e => set('category', e.target.value)}
-                className="w-full bg-[#0d0d1a] border border-[#2d2b52] rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-200"
               >
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label htmlFor="modal-type" className="text-slate-400 text-xs block mb-1">Type</label>
+              <label htmlFor="modal-type" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Type</label>
               <select
                 id="modal-type"
                 value={form.type}
                 onChange={e => set('type', e.target.value)}
-                className="w-full bg-[#0d0d1a] border border-[#2d2b52] rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-200"
               >
                 <option value="expense">Expense</option>
                 <option value="income">Income</option>
@@ -88,7 +88,7 @@ export default function AddTransactionModal({ transaction, onSave, onClose }) {
             </div>
           </div>
           <div>
-            <label htmlFor="modal-amount" className="text-slate-400 text-xs block mb-1">Amount ($)</label>
+            <label htmlFor="modal-amount" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Amount ($)</label>
             <input
               id="modal-amount"
               type="number"
@@ -97,7 +97,7 @@ export default function AddTransactionModal({ transaction, onSave, onClose }) {
               value={form.amount}
               onChange={e => set('amount', e.target.value)}
               placeholder="0.00"
-              className="w-full bg-[#0d0d1a] border border-[#2d2b52] rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-200"
             />
             {errors.amount && <p className="text-red-400 text-xs mt-1">{errors.amount}</p>}
           </div>
@@ -105,7 +105,7 @@ export default function AddTransactionModal({ transaction, onSave, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-[#1e1c33] text-slate-300 rounded-lg text-sm hover:bg-[#2d2b52] transition-colors"
+              className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-300 dark:hover:bg-[#16141f]"
             >
               Cancel
             </button>
