@@ -15,9 +15,8 @@ export function computeTotalBalance(transactions) {
 }
 
 export function computeBalanceTrendData(transactions) {
-  const sorted = [...transactions].sort((a, b) => a.date.localeCompare(b.date))
   const monthDeltas = {}
-  sorted.forEach(t => {
+  transactions.forEach(t => {
     const month = t.date.slice(0, 7)
     monthDeltas[month] = (monthDeltas[month] || 0) + (t.type === 'income' ? t.amount : -t.amount)
   })
@@ -63,6 +62,7 @@ export function computeMomChange(transactions) {
   if (months.length < 2) return null
   const prev = expensesByMonth[months[months.length - 2]]
   const curr = expensesByMonth[months[months.length - 1]]
+  if (prev === 0) return null
   return ((curr - prev) / prev) * 100
 }
 
