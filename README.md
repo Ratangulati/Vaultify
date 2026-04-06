@@ -81,7 +81,7 @@ src/
 - Average daily spend for current month
 - Category concentration callout badge when a category exceeds 40% of expenses
 
-### UX + Extras
+<!-- ### UX + Extras
 
 - Smooth section transitions with Framer Motion
 - Transactions and role persisted to `localStorage`
@@ -102,4 +102,4 @@ src/
 - `localStorage` persistence for role and transactions
 - Chart skeleton loading state
 - CSV export button in transactions controls
-- Helpful chart empty states when data is unavailable
+- Helpful chart empty states when data is unavailable -->
