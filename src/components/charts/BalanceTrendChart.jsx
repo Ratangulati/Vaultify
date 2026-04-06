@@ -2,9 +2,10 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { useApp } from '../../context/AppContext'
+import { formatMoney } from '../../utils/money'
 
 export default function BalanceTrendChart() {
-  const { balanceTrendData } = useApp()
+  const { balanceTrendData, currency } = useApp()
   const hasData = balanceTrendData.some(point => point.balance !== 0)
 
   return (
@@ -49,7 +50,7 @@ export default function BalanceTrendChart() {
               borderRadius: 8,
               color: '#e2e8f0',
             }}
-            formatter={v => [`$${Number(v).toLocaleString()}`, 'Balance']}
+            formatter={v => [formatMoney(Number(v), currency), 'Balance']}
           />
           <Area
             type="monotone"

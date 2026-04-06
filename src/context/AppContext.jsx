@@ -15,6 +15,11 @@ import {
   computeExpenseMomComparison,
   computeAverageDailySpend,
   computeOverspendAlert,
+  computeSavingsRate,
+  computeExpenseForecast,
+  computeBudgetUtilization,
+  computeAccountSplit,
+  applyDateRange,
   applyFilters,
 } from '../utils/derived'
 
@@ -26,6 +31,14 @@ const DEFAULT_FILTERS = {
   type: '',
   sortBy: 'date',
   sortDir: 'desc',
+}
+const DEFAULT_DATE_RANGE = { preset: 'all', start: '', end: '' }
+const DEFAULT_BUDGETS = {
+  Food: 300,
+  Rent: 1200,
+  Transport: 120,
+  Health: 180,
+  Entertainment: 150,
 }
 
 export function AppProvider({ children }) {
@@ -43,6 +56,8 @@ export function AppProvider({ children }) {
   const [role, setRole] = useState(() => localStorage.getItem('finance.role') || 'viewer')
   const [darkMode, setDarkMode] = useState(true)
   const [chartsLoading, setChartsLoading] = useState(true)
+  const [currency, setCurrency] = useState(() => localStorage.getItem('finance.currency') || 'INR')
+  const [dateRange, setDateRange] = useState(DEFAULT_DATE_RANGE)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
@@ -57,28 +72,38 @@ export function AppProvider({ children }) {
   }, [role])
 
   useEffect(() => {
+    localStorage.setItem('finance.currency', currency)
+  }, [currency])
+
+  useEffect(() => {
     const timer = setTimeout(() => setChartsLoading(false), 700)
     return () => clearTimeout(timer)
   }, [])
 
-  const totalIncome        = useMemo(() => computeTotalIncome(transactions), [transactions])
-  const totalExpenses      = useMemo(() => computeTotalExpenses(transactions), [transactions])
-  const totalBalance       = useMemo(() => computeTotalBalance(transactions), [transactions])
-  const monthlyIncome      = useMemo(() => computeCurrentMonthIncome(transactions), [transactions])
-  const monthlyExpenses    = useMemo(() => computeCurrentMonthExpenses(transactions), [transactions])
-  const balanceTrendData   = useMemo(() => computeBalanceTrendData(transactions), [transactions])
-  const spendingByCategory = useMemo(() => computeSpendingByCategory(transactions), [transactions])
-  const topCategory        = useMemo(() => computeTopCategory(transactions), [transactions])
-  const biggestTransaction = useMemo(() => computeBiggestTransaction(transactions), [transactions])
-  const momChange          = useMemo(() => computeMomChange(transactions), [transactions])
-  const topCategoryThisMonth = useMemo(() => computeTopCategoryThisMonth(transactions), [transactions])
-  const expenseMomComparison = useMemo(() => computeExpenseMomComparison(transactions), [transactions])
-  const averageDailySpend = useMemo(() => computeAverageDailySpend(transactions), [transactions])
-  const overspendAlert    = useMemo(() => computeOverspendAlert(transactions), [transactions])
-  const filteredTransactions = useMemo(() => applyFilters(transactions, filters), [transactions, filters])
+  const rangedTransactions = useMemo(() => applyDateRange(transactions, dateRange), [transactions, dateRange])
+  const totalIncome        = useMemo(() => computeTotalIncome(rangedTransactions), [rangedTransactions])
+  const totalExpenses      = useMemo(() => computeTotalExpenses(rangedTransactions), [rangedTransactions])
+  const totalBalance       = useMemo(() => computeTotalBalance(rangedTransactions), [rangedTransactions])
+  const monthlyIncome      = useMemo(() => computeCurrentMonthIncome(rangedTransactions), [rangedTransactions])
+  const monthlyExpenses    = useMemo(() => computeCurrentMonthExpenses(rangedTransactions), [rangedTransactions])
+  const balanceTrendData   = useMemo(() => computeBalanceTrendData(rangedTransactions), [rangedTransactions])
+  const spendingByCategory = useMemo(() => computeSpendingByCategory(rangedTransactions), [rangedTransactions])
+  const topCategory        = useMemo(() => computeTopCategory(rangedTransactions), [rangedTransactions])
+  const biggestTransaction = useMemo(() => computeBiggestTransaction(rangedTransactions), [rangedTransactions])
+  const momChange          = useMemo(() => computeMomChange(rangedTransactions), [rangedTransactions])
+  const topCategoryThisMonth = useMemo(() => computeTopCategoryThisMonth(rangedTransactions), [rangedTransactions])
+  const expenseMomComparison = useMemo(() => computeExpenseMomComparison(rangedTransactions), [rangedTransactions])
+  const averageDailySpend = useMemo(() => computeAverageDailySpend(rangedTransactions), [rangedTransactions])
+  const overspendAlert    = useMemo(() => computeOverspendAlert(rangedTransactions), [rangedTransactions])
+  const savingsRate       = useMemo(() => computeSavingsRate(rangedTransactions), [rangedTransactions])
+  const expenseForecast   = useMemo(() => computeExpenseForecast(rangedTransactions), [rangedTransactions])
+  const budgetUtilization = useMemo(() => computeBudgetUtilization(rangedTransactions, DEFAULT_BUDGETS), [rangedTransactions])
+  const accountSplit      = useMemo(() => computeAccountSplit(rangedTransactions), [rangedTransactions])
+  const filteredTransactions = useMemo(() => applyFilters(rangedTransactions, filters), [rangedTransactions, filters])
 
   function addTransaction(txn) {
-    setTransactions(prev => [{ ...txn, id: `txn_${Date.now()}` }, ...prev])
+    const id = globalThis.crypto?.randomUUID ? `txn_${crypto.randomUUID()}` : `txn_${Date.now()}`
+    setTransactions(prev => [{ ...txn, id, currency: txn.currency || currency }, ...prev])
   }
 
   function updateTransaction(id, updates) {
@@ -103,6 +128,8 @@ export function AppProvider({ children }) {
       filters,
       role,
       darkMode,
+      currency,
+      dateRange,
       totalIncome,
       totalExpenses,
       totalBalance,
@@ -117,9 +144,15 @@ export function AppProvider({ children }) {
       expenseMomComparison,
       averageDailySpend,
       overspendAlert,
+      savingsRate,
+      expenseForecast,
+      budgetUtilization,
+      accountSplit,
       chartsLoading,
       filteredTransactions,
       setRole,
+      setCurrency,
+      setDateRange,
       addTransaction,
       updateTransaction,
       deleteTransaction,

@@ -1,14 +1,25 @@
 import { useState } from 'react'
+import { useApp } from '../../context/AppContext'
 
 const CATEGORIES = ['Food', 'Rent', 'Salary', 'Entertainment', 'Health', 'Transport']
+const ACCOUNTS = ['cash', 'bank', 'credit']
+const CURRENCIES = [
+  { code: 'INR', label: 'INR (₹)' },
+  { code: 'USD', label: 'USD ($)' },
+  { code: 'CNY', label: 'CNY (¥)' },
+  { code: 'EUR', label: 'EUR (€)' },
+]
 
 export default function AddTransactionModal({ transaction, onSave, onClose }) {
+  const { currency: defaultCurrency } = useApp()
   const [form, setForm] = useState({
     date:        transaction?.date        ?? new Date().toISOString().slice(0, 10),
     description: transaction?.description ?? '',
     category:    transaction?.category    ?? 'Food',
     type:        transaction?.type        ?? 'expense',
     amount:      transaction?.amount      ?? '',
+    currency:    transaction?.currency    ?? defaultCurrency,
+    account:     transaction?.account     ?? 'bank',
   })
   const [errors, setErrors] = useState({})
 
@@ -88,7 +99,33 @@ export default function AddTransactionModal({ transaction, onSave, onClose }) {
             </div>
           </div>
           <div>
-            <label htmlFor="modal-amount" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Amount ($)</label>
+            <label htmlFor="modal-currency" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Currency</label>
+            <select
+              id="modal-currency"
+              value={form.currency}
+              onChange={e => set('currency', e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-200"
+            >
+              {CURRENCIES.map(c => (
+                <option key={c.code} value={c.code}>{c.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="modal-account" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Account</label>
+            <select
+              id="modal-account"
+              value={form.account}
+              onChange={e => set('account', e.target.value)}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-indigo-500 dark:border-[#2d2b52] dark:bg-[#0d0d1a] dark:text-slate-200"
+            >
+              {ACCOUNTS.map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="modal-amount" className="mb-1 block text-xs text-slate-600 dark:text-slate-400">Amount</label>
             <input
               id="modal-amount"
               type="number"

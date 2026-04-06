@@ -18,6 +18,11 @@ function monthKey(date) {
   return date.slice(0, 7)
 }
 
+function toDateOnly(value) {
+  const d = new Date(value)
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+}
+
 function toMonthLabel(key) {
   const [year, month] = key.split('-')
   return new Date(Number(year), Number(month) - 1, 1).toLocaleString('en-US', { month: 'short' })
@@ -48,6 +53,31 @@ export function computeBalanceTrendData(transactions) {
   return months.map(month => {
     running += monthDeltas[month] || 0
     return { month: toMonthLabel(month), balance: running }
+  })
+}
+
+export function applyDateRange(transactions, range) {
+  if (!range || range.preset === 'all') return [...transactions]
+  if (transactions.length === 0) return []
+  const sorted = [...transactions].sort((a, b) => a.date.localeCompare(b.date))
+  const maxDate = toDateOnly(sorted[sorted.length - 1].date)
+
+  let start = null
+  let end = null
+
+  if (range.preset === '7d') start = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate() - 6)
+  if (range.preset === '30d') start = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate() - 29)
+  if (range.preset === '90d') start = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate() - 89)
+  if (range.preset === 'custom') {
+    start = range.start ? toDateOnly(range.start) : null
+    end = range.end ? toDateOnly(range.end) : null
+  }
+
+  return transactions.filter(t => {
+    const d = toDateOnly(t.date)
+    if (start && d < start) return false
+    if (end && d > end) return false
+    return true
   })
 }
 
@@ -170,6 +200,67 @@ export function computeOverspendAlert(transactions, threshold = 40) {
     percentage: pct,
     month: latestMonth,
   }
+}
+
+export function computeSavingsRate(transactions) {
+  const income = computeTotalIncome(transactions)
+  const expenses = computeTotalExpenses(transactions)
+  if (income <= 0) return null
+  return ((income - expenses) / income) * 100
+}
+
+export function computeExpenseForecast(transactions) {
+  if (transactions.length === 0) return null
+  const latest = [...transactions].sort((a, b) => a.date.localeCompare(b.date)).at(-1)
+  const latestDate = new Date(latest.date)
+  const currentMonth = monthKey(latest.date)
+  const currentExpenses = transactions
+    .filter(t => t.type === 'expense' && monthKey(t.date) === currentMonth)
+    .reduce((sum, t) => sum + t.amount, 0)
+  const dayOfMonth = latestDate.getDate()
+  const daysInMonth = new Date(latestDate.getFullYear(), latestDate.getMonth() + 1, 0).getDate()
+  if (dayOfMonth <= 0) return null
+  return {
+    currentMonth,
+    currentExpenses,
+    projected: (currentExpenses / dayOfMonth) * daysInMonth,
+  }
+}
+
+export function computeBudgetUtilization(transactions, budgetsByCategory = {}) {
+  const byCategory = {}
+  transactions
+    .filter(t => t.type === 'expense')
+    .forEach(t => {
+      byCategory[t.category] = (byCategory[t.category] || 0) + t.amount
+    })
+
+  return Object.entries(budgetsByCategory).map(([category, budget]) => {
+    const spent = byCategory[category] || 0
+    const percentage = budget > 0 ? (spent / budget) * 100 : 0
+    return {
+      category,
+      spent,
+      budget,
+      percentage,
+      overBudget: spent > budget,
+    }
+  })
+}
+
+export function computeAccountSplit(transactions) {
+  const totals = { cash: 0, bank: 0, credit: 0 }
+  transactions.forEach(t => {
+    const inferredAccount = t.account
+      || (t.category === 'Rent' || t.category === 'Salary' ? 'bank'
+        : t.category === 'Transport' || t.category === 'Entertainment' ? 'credit'
+          : 'cash')
+    const account = inferredAccount
+    const signed = t.type === 'income' ? t.amount : -t.amount
+    if (!(account in totals)) totals[account] = 0
+    totals[account] += signed
+  })
+  return totals
 }
 
 export function applyFilters(transactions, filters) {

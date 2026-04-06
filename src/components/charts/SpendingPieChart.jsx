@@ -1,5 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { useApp } from '../../context/AppContext'
+import { formatMoney } from '../../utils/money'
 
 const CATEGORY_COLORS = {
   Rent:          '#f87171',
@@ -11,7 +12,7 @@ const CATEGORY_COLORS = {
 }
 
 export default function SpendingPieChart() {
-  const { spendingByCategory } = useApp()
+  const { spendingByCategory, currency } = useApp()
   const total = spendingByCategory.reduce((s, c) => s + c.value, 0)
   const hasData = total > 0
   const top = spendingByCategory.length > 0
@@ -50,7 +51,7 @@ export default function SpendingPieChart() {
               borderRadius: 8,
               color: '#e2e8f0',
             }}
-            formatter={v => [`$${Number(v).toLocaleString()}`, '']}
+            formatter={v => [formatMoney(Number(v), currency), '']}
           />
           {top && (
             <>

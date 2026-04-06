@@ -11,6 +11,7 @@ const txn = {
   category: 'Food',
   type: 'expense',
   amount: 50,
+  currency: 'INR',
 }
 
 function ViewerWrapper({ children }) {
@@ -41,7 +42,7 @@ describe('TransactionRow (viewer)', () => {
     )
     expect(screen.getByText('Test Grocery')).toBeInTheDocument()
     expect(screen.getByText('Food')).toBeInTheDocument()
-    expect(screen.getByText('-$50')).toBeInTheDocument()
+    expect(screen.getByText(/-₹/)).toBeInTheDocument()
   })
 
   it('does not show edit or delete buttons for viewer', () => {
